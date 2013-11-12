@@ -16,32 +16,34 @@ public class CPUMonScreen extends View {
 	int size, start, curPoint = -1, nextPoint;
 	boolean toggle = true;
 	Paint paint = new Paint();
+	// Use an ArrayDeque to store the 20 most recent percentage points of CPU usage
 	ArrayDeque<Integer> lines = new ArrayDeque<Integer>();
 	
 	public CPUMonScreen(Context context, AttributeSet set) {
-        super(context, set);
+        	super(context, set);
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
+		
 		//draw monitor screen
-    	paint.setColor(Color.BLACK);
-    	canvas.drawRect(0, 0, 400, 300, paint);
-    	paint.setColor(Color.GREEN);
-    	canvas.drawLine(0, 0, 400, 0, paint);
-    	canvas.drawLine(0, 75, 400, 75, paint);
-    	canvas.drawLine(0, 150, 400, 150, paint);
-    	canvas.drawLine(0, 225, 400, 225, paint);
-    	canvas.drawLine(0, 300, 400, 300, paint);
-    	
-    	//draw horizontal bar
-    	paint.setColor(Color.BLACK);
-    	canvas.drawRect(415, 0, 445, 300, paint);
-    	paint.setColor(Color.YELLOW);
-    	canvas.drawRect(415, 300 - size, 445, 300, paint);
-
-    	drawVerticalLines(canvas);
-    	drawCPUPoints(canvas);
+	    	paint.setColor(Color.BLACK);
+	    	canvas.drawRect(0, 0, 400, 300, paint);
+	    	paint.setColor(Color.GREEN);
+	    	canvas.drawLine(0, 0, 400, 0, paint);
+	    	canvas.drawLine(0, 75, 400, 75, paint);
+	    	canvas.drawLine(0, 150, 400, 150, paint);
+	    	canvas.drawLine(0, 225, 400, 225, paint);
+	    	canvas.drawLine(0, 300, 400, 300, paint);
+	    	
+	    	//draw horizontal bar
+	    	paint.setColor(Color.BLACK);
+	    	canvas.drawRect(415, 0, 445, 300, paint);
+	    	paint.setColor(Color.YELLOW);
+	    	canvas.drawRect(415, 300 - size, 445, 300, paint);
+	
+	    	drawVerticalLines(canvas);
+	    	drawCPUPoints(canvas);
 	}
 
 	private void drawCPUPoints(Canvas canvas) {
@@ -73,6 +75,9 @@ public class CPUMonScreen extends View {
 	private void drawVerticalLines(Canvas canvas) {
 		paint.setColor(Color.GRAY);
 		
+		// If <toggle> is true, start drawing the lines at the edge of the screen; otherwise
+		// start 20 pixels in. Combined with the lines connection the graph points, this alternation  
+		// gives the illusion of a moving graph.
 		start = (toggle) ? 0 : 20;
 		
 		for (int i = 0; i < 10; ++i) {
@@ -83,13 +88,14 @@ public class CPUMonScreen extends View {
 		toggle = (toggle) ? false : true;
 	}
     
-    public void clearLines() {
-        lines.clear();
-    }
+	public void clearLines() {
+	lines.clear();
+	}
 
 	public void setSize(int total) {
 		size = total;
 		lines.addLast(total);
+		// if more than 20 points of data are in the ArrayDeque, pop the oldest point off
 		if (lines.size() > 20) { lines.removeFirst(); }
 		invalidate();
 	}
